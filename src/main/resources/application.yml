@@ -1,0 +1,67 @@
+server:
+  port: 9999
+spring:
+  shardingsphere:
+    mode:
+      type: Memory
+    # 数据源配置
+    datasource:
+      names: master,slave
+      # 主数据源
+      master:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.jc.mysql.Driver
+        jdbc-url: jdbc:mysql://162.14.96.81:3309/weekly?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+        username: root
+        password: nwa999
+      # 从机数据源
+      slave:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.jc.mysql.Driver
+        jdbc-url: jdbc:mysql://162.14.96.81:3310/weekly?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+        username: root
+        password: nwa999
+    rules:
+      readwrite-splitting:
+        data-sources:
+          mydatasource:
+            # 类型是静态还是动态
+            type: Static
+            props:
+              write-data-source-name: master
+              read-data-source-names: slave
+            # 使用的逻辑策略
+            load-balancer-name: round-alg
+        # 负载均衡策略
+        load-balancers:
+          # 轮询
+          round-alg:
+            type: ROUND_ROBIN
+          # 随机
+          random-alg:
+            type: RANDOM
+          # 权重，我们在配置权重的时候必须配置各个 slave 的权重值，值的数据类型为 double
+          weight-alg:
+            type: WEIGHT
+            props:
+              slave: 1.0
+    props:
+      show-sql: true
+
+  main:
+    allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher  #配置api文档
+    static-path-pattern: /static/**  #静态资源存放
+
+mybatis-plus:
+  type-aliases-package: com.nwa.bean
+  mapper-locations: classpath:mapper/*xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+
+

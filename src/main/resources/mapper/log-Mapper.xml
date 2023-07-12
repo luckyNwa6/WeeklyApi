@@ -1,0 +1,11 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nwa.mapper.LogMapper">
+
+
+    <insert id="save">
+        insert into tb_log(log_sys,request_ip,create_by,create_date,log_browser,log_tip)
+        values(#{logSys},#{requestIp},#{createBy},#{createDate},#{logBrowser},#{logTip})
+
+    </insert>
+</mapper>

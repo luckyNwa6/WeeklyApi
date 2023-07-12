@@ -1,0 +1,83 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nwa.mapper.AdHomeMapper">
+    <resultMap id="BaseResultMap" type="com.nwa.bean.Client">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_acc" property="userAcc"/>
+        <result column="user_pwd" property="userPwd"/>
+        <result column="log_sys" property="logSys"/>
+        <result column="request_ip" property="requestIp"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_date" property="createDate"/>
+        <result column="log_browser" property="logBrowser"/>
+        <result column="log_tip" property="logTip"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap2" type="com.nwa.bean.Client">
+        <id column="id" property="id"/>
+        <result column="months" property="months"/>
+        <result column="week_num" property="weekNum"/>
+        <result column="monday" property="monday"/>
+        <result column="sunday" property="sunday"/>
+        <result column="create_time" property="createTime"/>
+        <result column="state" property="state"/>
+
+    </resultMap>
+    <insert id="addOneMon" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_months(months,week_num,monday,sunday,state) values (#{months},#{weekNum},#{monday},#{sunday},1)
+    </insert>
+
+
+    <update id="modifyPwd" parameterType="java.lang.String">
+        update tb_user set user_pwd=#{pwd} where user_acc=#{acc}
+    </update>
+    <update id="keepMyWeekly">
+        update tb_weeks set summary1=#{summary1},summary2=#{summary2},summary3=#{summary3},
+         plan1=#{plan1},plan2=#{plan2},plan3=#{plan3}
+         where months_id=#{monthsId}
+
+
+    </update>
+    <delete id="delMyWeekOne">
+       update tb_months set state=0 where id =#{id}
+    </delete>
+    <delete id="delMyWeekMore">
+        update tb_months set state=0
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="personShow" parameterType="java.lang.String" resultType="Client">
+        SELECT a.areaId,createTime,
+        areaName,
+        (SELECT GROUP_CONCAT(cityName Separator '、') from tb_city where areaId =a.areaId GROUP BY areaId) cityName,
+        (SELECT GROUP_CONCAT(addDetail Separator '、') FROM tb_add a WHERE cityId in (SELECT cityId from tb_city where
+        areaId = a.areaId)) addDetail
+        FROM tb_area a
+        <if test="acc!=null and acc!=''">
+            and userAcc like concat('%',#{acc},'%')
+        </if>
+    </select>
+    <select id="getLogList" resultMap="BaseResultMap">
+        select * from tb_log
+    </select>
+    <select id="getMyWeekList" resultMap="BaseResultMap2">
+
+        select * from tb_months
+        <where>
+            state=1
+            <if test="months!=null and months!=''">
+                and months=#{months}
+            </if>
+            <if test="id!=null and id!=''">
+                and id=#{id}
+            </if>
+        </where>
+    </select>
+    <select id="getMyWeek" resultType="Client" parameterType="java.lang.String">
+        select * from tb_weeks where months_id=#{id}
+    </select>
+
+</mapper>

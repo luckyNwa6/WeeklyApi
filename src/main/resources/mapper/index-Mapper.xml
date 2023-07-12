@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nwa.mapper.IndexMapper">
+    <resultMap id="BaseResultMap" type="com.nwa.bean.Client">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_acc" property="userAcc"/>
+        <result column="user_pwd" property="userPwd"/>
+        <result column="role_id" property="roleId"/>
+    </resultMap>
+    <select id="login" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select u.*,r.role_id from tb_user u inner join tb_link r on u.user_id=r.user_id
+    where u.user_acc=#{acc} and u.user_pwd=#{pwd}
+    </select>
+
+
+</mapper>
